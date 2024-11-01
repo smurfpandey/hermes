@@ -45,10 +45,12 @@ const goToForgotPassword = () => {
         <Button class="w-full" variant="link" @click="goToForgotPassword">
           Forgot Password?
         </Button>
+      </CardFooter>
+      <div>
         <Button class="w-full" variant="link" @click="goToSignup">
           Don't have an account? Sign up
         </Button>
-      </CardFooter>
+      </div>
     </Card>
   </Container>
 </template>
