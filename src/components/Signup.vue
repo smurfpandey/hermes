@@ -14,20 +14,25 @@ import { Label } from '@/components/ui/label';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const goToSignup = () => {
-  router.push('/signup');
+const goToLogin = () => {
+  router.push('/login');
 };
 </script>
+
 <template>
   <Container class="flex h-screen p-4 mt-[-65px]">
     <Card class="w-96 m-auto max-w-md">
       <CardHeader class="space-y-1">
-        <CardTitle class="text-2xl"> Create an account </CardTitle>
+        <CardTitle class="text-2xl"> Sign up </CardTitle>
         <CardDescription>
-          Enter your email below to create your account
+          Enter your details below to create your account
         </CardDescription>
       </CardHeader>
       <CardContent class="grid gap-4">
+        <div class="grid gap-2">
+          <Label for="fullname">Full Name</Label>
+          <Input id="fullname" type="text" placeholder="John Doe" />
+        </div>
         <div class="grid gap-2">
           <Label for="email">Email</Label>
           <Input id="email" type="email" placeholder="m@example.com" />
@@ -38,9 +43,9 @@ const goToSignup = () => {
         </div>
       </CardContent>
       <CardFooter>
-        <Button class="w-full"> Create account </Button>
-        <Button class="w-full" variant="link" @click="goToSignup">
-          Don't have an account? Sign up
+        <Button class="w-full"> Sign up </Button>
+        <Button class="w-full" variant="link" @click="goToLogin">
+          Already have a account? Login
         </Button>
       </CardFooter>
     </Card>
