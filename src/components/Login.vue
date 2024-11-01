@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 </script>
 <template>
-  <Container class="flex h-svh p-4">
+  <Container class="flex h-screen p-4 mt-[-65px]">
     <Card class="w-96 m-auto">
       <CardHeader class="space-y-1">
         <CardTitle class="text-2xl"> Create an account </CardTitle>
