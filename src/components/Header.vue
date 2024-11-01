@@ -1,5 +1,6 @@
 <script setup>
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 </script>
 <template>
   <div class="flex-col md:flex">

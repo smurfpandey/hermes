@@ -17,6 +17,9 @@ const router = useRouter();
 const goToSignup = () => {
   router.push('/signup');
 };
+const goToForgotPassword = () => {
+  router.push('/forgot-password'); // Add navigation to forgot password
+};
 </script>
 <template>
   <Container class="flex h-screen p-4 mt-[-65px]">
@@ -39,6 +42,9 @@ const goToSignup = () => {
       </CardContent>
       <CardFooter>
         <Button class="w-full"> Create account </Button>
+        <Button class="w-full" variant="link" @click="goToForgotPassword">
+          Forgot Password?
+        </Button>
         <Button class="w-full" variant="link" @click="goToSignup">
           Don't have an account? Sign up
         </Button>

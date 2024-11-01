@@ -11,6 +11,7 @@ import App from '@/App.vue';
 import Home from '@/components/Home.vue';
 import Login from '@/components/Login.vue';
 import Signup from '@/components/Signup.vue';
+import ForgotPassword from '@/components/ForgotPassword.vue';
 
 library.add([faArrowRight, faCalendar, faClock, faTrain]);
 
@@ -18,6 +19,8 @@ const routes = [
   { path: '/', component: Home, meta: { requiresAuth: true } },
   { path: '/login', component: Login },
   { path: '/signup', component: Signup },
+  { path: '/forgot-password', component: ForgotPassword },
+  { path: '/reset-password', component: ForgotPassword },
 ];
 
 const router = createRouter({
