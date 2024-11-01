@@ -41,6 +41,10 @@ const goToLogin = () => {
           <Label for="password">Password</Label>
           <Input id="password" type="password" />
         </div>
+        <div class="grid gap-2">
+          <Label for="password">Confirm Password</Label>
+          <Input id="password" type="password" />
+        </div>
       </CardContent>
       <CardFooter>
         <Button class="w-full"> Sign up </Button>
