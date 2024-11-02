@@ -26,10 +26,14 @@ import { Calendar as CalendarIcon } from 'lucide-vue-next';
 import { computed, h, ref } from 'vue';
 import dayjs from 'dayjs';
 
+import { fetchFlightSchedule } from '@/lib/amadeusClient';
+
 const flightDoDCalendarOpen = ref(false);
 const flightDoDValue = ref('');
 const flightNum = ref('');
+const airlineCode = ref('');
 const isFlightLoading = ref(false);
+const errorMessage = ref('');
 
 const handleFlightDODCal = () => {
   flightDoDCalendarOpen.value = false;
@@ -44,9 +48,48 @@ const openFlightDoDCalendar = () => {
   flightDoDCalendarOpen.value = true;
 };
 
-const fetchFlightDetail = () => {
+const fetchFlightDetail = async () => {
+  if (!airlineCode.value || !/^[a-zA-Z0-9]{2,3}$/.test(airlineCode.value)) {
+    return;
+  }
+  if (!flightNum.value || !/^\d{2,4}$/.test(flightNum.value)) {
+    return;
+  }
+  if (!flightDoDValue.value) {
+    return;
+  }
+
   isFlightLoading.value = true;
-  alert(flightNum.value);
+  try {
+    let departureDate = flightDoDValue.value.toString();
+
+    const flightInfo = await fetchFlightSchedule(
+      airlineCode.value,
+      flightNum.value,
+      departureDate,
+    );
+
+    alert(flightInfo);
+
+    // const response = await fetch(
+    //   `http://api.aviationstack.com/v1/flights?access_key=${accessKey}&flight_iata=${flightNum.value}&flight_date=${departureDate}`,
+    // );
+    // if (!response.ok) {
+    //   errorMessage.value =
+    //     'Something went wrong when trying to fetch flight details!';
+    // }
+    // const data = await response.json();
+    // flightDetail.value = data;
+    // const departureCity = data.data[0]?.departure?.airport;
+    // const arrivalCity = data.data[0]?.arrival?.airport;
+    // console.log('Departure City:', departureCity);
+    // console.log('Arrival City:', arrivalCity);
+  } catch (error) {
+    errorMessage.value =
+      'Something went wrong when trying to fetch flight details!';
+  } finally {
+    isFlightLoading.value = false;
+  }
 };
 </script>
 
@@ -101,26 +144,43 @@ const fetchFlightDetail = () => {
                 </PopoverContent>
               </Popover>
             </div>
-            <div class="grid gap-2">
-              <Label for="flightNum">Flight Number</Label>
-              <div class="relative w-full max-w-sm items-center">
-                <Input
-                  id="flightNum"
-                  type="text"
-                  placeholder="e.g. 6E4598"
-                  v-model="flightNum"
-                  @focusout="fetchFlightDetail"
-                />
-                <span
-                  class="absolute end-0 inset-y-0 flex items-center justify-center px-2"
-                >
-                  <Loader2
-                    class="w-4 h-4 mr-2 animate-spin"
-                    v-if="isFlightLoading"
+            <div class="grid grid-cols-2 gap-4">
+              <div class="col-span-1">
+                <Label for="airlineCode">Airline Code</Label>
+                <div class="relative w-full max-w-sm items-center">
+                  <Input
+                    id="airlineCode"
+                    type="text"
+                    placeholder="e.g. 6E"
+                    v-model="airlineCode"
+                    @focusout="fetchFlightDetail"
                   />
-                </span>
+                </div>
+              </div>
+              <div class="col-span-1">
+                <Label for="flightNum">Flight Number</Label>
+                <div class="relative w-full max-w-sm items-center">
+                  <Input
+                    id="flightNum"
+                    type="text"
+                    placeholder="e.g. 4598"
+                    v-model="flightNum"
+                    @focusout="fetchFlightDetail"
+                  />
+                  <span
+                    class="absolute end-0 inset-y-0 flex items-center justify-center px-2"
+                  >
+                    <Loader2
+                      class="w-4 h-4 mr-2 animate-spin"
+                      v-if="isFlightLoading"
+                    />
+                  </span>
+                </div>
               </div>
             </div>
+            <span v-if="errorMessage" class="text-red-500">{{
+              errorMessage
+            }}</span>
             <SheetFooter class="mt-4">
               <SheetClose as-child>
                 <Button type="submit"> Save Flight </Button>
