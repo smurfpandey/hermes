@@ -24,12 +24,12 @@ const router = useRouter();
 
 const handleForgotPassword = async () => {
   const redirectTo = `${window.location.origin}/reset-password`; // Add redirect URL
-  const { supaError } = await supabase.auth.resetPasswordForEmail(email.value, {
+  const resp = await supabase.auth.resetPasswordForEmail(email.value, {
     redirectTo,
   });
-  if (supaError) {
+  if (resp.error) {
     message.value = '';
-    error.value = supaError.message;
+    error.value = resp.error.message;
   } else {
     message.value = 'Password reset link has been sent to your email.';
     error.value = '';
@@ -42,12 +42,12 @@ const handleResetPassword = async () => {
     return;
   }
 
-  const { supaError } = await supabase.auth.updateUser({
+  const resp = await supabase.auth.updateUser({
     password: password.value,
   });
-  if (supaError) {
+  if (resp.error) {
     message.value = '';
-    error.value = supaError.message;
+    error.value = resp.error.message;
   } else {
     message.value = 'Password has been reset successfully.';
     error.value = '';
