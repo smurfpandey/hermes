@@ -27,6 +27,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar as CalendarIcon } from 'lucide-vue-next';
 import { computed, h, ref } from 'vue';
 import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(timezone);
 
 import { fetchFlightSchedule, fetchAirportDetails } from '@/lib/amadeusClient';
 
@@ -43,6 +46,10 @@ const arrivalAirportCode = ref('');
 
 const flightDepartDateTime = ref('');
 const flightArriveDateTime = ref('');
+
+const formattedDepartureTime = ref(''); // Only time part for the input box
+const formattedArrivalTime = ref('');
+const isNextDay = ref(false);
 
 const handleFlightDODCal = () => {
   flightDoDCalendarOpen.value = false;
@@ -107,22 +114,42 @@ const fetchFlightDetail = async () => {
       return time.qualifier === 'STD';
     });
     flightDepartDateTime.value = departureTiming.value;
+    formattedDepartureTime.value = dayjs(
+      departureTiming.value,
+      'YYYY-MM-DDTHH:mm:ssZ',
+    ).format('hh:mm A');
 
     const arrivalLocation = await fetchAirportDetails(arrivalPoint.iataCode);
     const arrivalCity = find(arrivalLocation.data, (loc) => {
       return loc.iataCode === arrivalPoint.iataCode;
     });
-
-    arrivalCityName.value = arrivalCity.address.cityName;
-    arrivalAirportCode.value = arrivalPoint.iataCode;
+    if (arrivalCity) {
+      arrivalCityName.value = arrivalCity.address.cityName;
+      arrivalAirportCode.value = arrivalPoint.iataCode;
+    }
 
     const arrivalTime = find(arrivalPoint.arrival.timings, (time) => {
       return time.qualifier === 'STA';
     });
     flightArriveDateTime.value = arrivalTime.value;
+    formattedArrivalTime.value = dayjs(
+      arrivalTime.value,
+      'YYYY-MM-DDTHH:mm:ssZ',
+    ).format('hh:mm A');
+
+    // check if flight is next day or same day
+    const diffDays = dayjs(arrivalTime.value).diff(
+      departureTiming.value,
+      'day',
+    );
+    if (diffDays > 0) {
+      isNextDay.value = true;
+    }
+    console.log(diffDays);
   } catch (error) {
     errorMessage.value =
       'Something went wrong when trying to fetch flight details!';
+    throw error;
   } finally {
     isFlightLoading.value = false;
   }
@@ -249,7 +276,7 @@ const fetchFlightDetail = async () => {
                     type="text"
                     placeholder="e.g. 05:30 AM"
                     class="capitalize"
-                    v-model="flightDepartDateTime"
+                    v-model="formattedDepartureTime"
                   />
                 </div>
               </div>
@@ -261,8 +288,9 @@ const fetchFlightDetail = async () => {
                     type="text"
                     placeholder="e.g. 09:10 PM"
                     class="capitalize"
-                    v-model="flightArriveDateTime"
+                    v-model="formattedArrivalTime"
                   />
+                  <span class="text-xs" v-if="isNextDay">(Next day)</span>
                 </div>
               </div>
             </div>
