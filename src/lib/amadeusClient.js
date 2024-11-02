@@ -91,39 +91,4 @@ async function fetchFlightSchedule(carrierCode, flightNumber, departureDate) {
   }
 }
 
-async function fetchAirportDetails(iataCode) {
-  const cacheKey = `airport-${iataCode}`;
-  const cachedData = JSON.parse(localStorage.getItem(cacheKey) || '{}');
-
-  if (cachedData.data) {
-    return cachedData.data;
-  }
-
-  const accessToken = await fetchAccessToken();
-
-  try {
-    const response = await fetch(
-      `${AIRPORT_DETAILS_API_URL}?subType=AIRPORT&keyword=${iataCode}&view=LIGHT`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch airport details');
-    }
-
-    const data = await response.json();
-    localStorage.setItem(cacheKey, JSON.stringify({ data }));
-    return data;
-  } catch (error) {
-    console.error('Error fetching airport details:', error);
-    throw error;
-  }
-}
-
-export { fetchFlightSchedule, fetchAirportDetails };
+export { fetchFlightSchedule };
