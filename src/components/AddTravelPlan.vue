@@ -41,6 +41,9 @@ const departureAirportCode = ref('');
 const arrivalCityName = ref('');
 const arrivalAirportCode = ref('');
 
+const flightDepartDateTime = ref('');
+const flightArriveDateTime = ref('');
+
 const handleFlightDODCal = () => {
   flightDoDCalendarOpen.value = false;
 };
@@ -100,6 +103,11 @@ const fetchFlightDetail = async () => {
     departureCityName.value = departureCity.address.cityName;
     departureAirportCode.value = departurePoint.iataCode;
 
+    const departureTiming = find(departurePoint.departure.timings, (time) => {
+      return time.qualifier === 'STD';
+    });
+    flightDepartDateTime.value = departureTiming.value;
+
     const arrivalLocation = await fetchAirportDetails(arrivalPoint.iataCode);
     const arrivalCity = find(arrivalLocation.data, (loc) => {
       return loc.iataCode === arrivalPoint.iataCode;
@@ -107,6 +115,11 @@ const fetchFlightDetail = async () => {
 
     arrivalCityName.value = arrivalCity.address.cityName;
     arrivalAirportCode.value = arrivalPoint.iataCode;
+
+    const arrivalTime = find(arrivalPoint.arrival.timings, (time) => {
+      return time.qualifier === 'STA';
+    });
+    flightArriveDateTime.value = arrivalTime.value;
   } catch (error) {
     errorMessage.value =
       'Something went wrong when trying to fetch flight details!';
@@ -223,6 +236,32 @@ const fetchFlightDetail = async () => {
                     placeholder="e.g. Paris"
                     class="capitalize"
                     v-model="arrivalCityName"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="col-span-1">
+                <Label for="departTime">Departure Time</Label>
+                <div class="relative w-full max-w-sm items-center">
+                  <Input
+                    id="departTime"
+                    type="text"
+                    placeholder="e.g. 05:30 AM"
+                    class="capitalize"
+                    v-model="flightDepartDateTime"
+                  />
+                </div>
+              </div>
+              <div class="col-span-1">
+                <Label for="arrivalTime">Arrival Time</Label>
+                <div class="relative w-full max-w-sm items-center">
+                  <Input
+                    id="arrivalTime"
+                    type="text"
+                    placeholder="e.g. 09:10 PM"
+                    class="capitalize"
+                    v-model="flightArriveDateTime"
                   />
                 </div>
               </div>
