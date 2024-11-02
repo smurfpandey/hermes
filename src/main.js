@@ -1,7 +1,3 @@
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faClock, faCalendar } from '@fortawesome/free-regular-svg-icons';
-import { faArrowRight, faTrain } from '@fortawesome/free-solid-svg-icons';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -48,7 +44,4 @@ router.beforeEach(async (to, from, next) => {
   return next('/login');
 });
 
-createApp(App)
-  .component('font-awesome-icon', FontAwesomeIcon)
-  .use(router)
-  .mount('#app');
+createApp(App).use(router).mount('#app');
