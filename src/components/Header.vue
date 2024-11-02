@@ -1,6 +1,7 @@
 <script setup>
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+
+import AddTravelPlan from '@/components/AddTravelPlan.vue';
 </script>
 <template>
   <div class="flex-col md:flex">
@@ -18,7 +19,7 @@ import { Button } from '@/components/ui/button';
           </h3>
         </nav>
         <div class="ml-auto flex items-center space-x-4">
-          <Button> + Add Travel </Button>
+          <AddTravelPlan />
         </div>
       </div>
     </div>
