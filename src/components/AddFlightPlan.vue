@@ -2,7 +2,7 @@
 import { find } from 'lodash-es';
 import { Calendar as CalendarIcon, Loader2 } from 'lucide-vue-next';
 import dayjs from 'dayjs';
-import { defineProps, ref } from 'vue';
+import { defineEmits, defineProps, ref } from 'vue';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -53,6 +53,7 @@ const props = defineProps({
     required: true,
   },
 });
+const emit = defineEmits(['update:isParentSheetOpen']);
 
 const handleFlightDODCal = () => {
   flightDoDCalendarOpen.value = false;
@@ -152,6 +153,44 @@ const fetchFlightDetail = async () => {
 };
 
 const saveFlightPlan = async () => {
+  // Reset error message
+  errorMessage.value = '';
+
+  // Validate required fields
+  if (!airlineCode.value || !/^[a-zA-Z0-9]{2,3}$/.test(airlineCode.value)) {
+    errorMessage.value = 'Please enter a valid airline code (2-3 characters)';
+    return;
+  }
+
+  if (!flightNum.value || !/^\d{2,4}$/.test(flightNum.value)) {
+    errorMessage.value = 'Please enter a valid flight number (2-4 digits)';
+    return;
+  }
+
+  if (!flightDoDValue.value) {
+    errorMessage.value = 'Please select a date of departure';
+    return;
+  }
+
+  if (!departureAirportCode.value || !departureCityName.value) {
+    errorMessage.value = 'Departure city information is missing';
+    return;
+  }
+
+  if (!arrivalAirportCode.value || !arrivalCityName.value) {
+    errorMessage.value = 'Arrival city information is missing';
+    return;
+  }
+
+  if (!flightDepartDateTime.value) {
+    errorMessage.value = 'Departure date time is missing';
+    return;
+  }
+
+  if (!flightArriveDateTime.value) {
+    errorMessage.value = 'Arrival date time is missing';
+    return;
+  }
   isLoading.value = true;
   const travelPlan = {
     transport_type: 'FLIGHT',
@@ -177,10 +216,10 @@ const saveFlightPlan = async () => {
     .insert([{ ...travelPlan }]);
 
   if (supaResp.error) {
-    errorMessage = supaResp.error.message;
+    errorMessage.value = supaResp.error.message;
   } else {
-    errorMessage = 'Value saved successfully';
-    props.isParentSheetOpe.value = false;
+    errorMessage.value = 'Value saved successfully';
+    emit('update:isParentSheetOpen', false);
   }
 };
 </script>
