@@ -1,6 +1,8 @@
 const AMADEUS_API_URL = 'https://test.api.amadeus.com/v1/security/oauth2/token';
 const FLIGHT_SCHEDULE_API_URL =
   'https://test.api.amadeus.com/v2/schedule/flights';
+const AIRPORT_DETAILS_API_URL =
+  'https://test.api.amadeus.com/v1/reference-data/locations';
 const CLIENT_ID = import.meta.env.VITE_AMADEUS_KEY;
 const CLIENT_SECRET = import.meta.env.VITE_AMADEUS_SECERT;
 const TOKEN_KEY = 'amadeus_access_token';
@@ -45,6 +47,19 @@ async function fetchAccessToken() {
 }
 
 async function fetchFlightSchedule(carrierCode, flightNumber, departureDate) {
+  const cacheKey = `${carrierCode}-${flightNumber}-${departureDate}`;
+  const cachedData = JSON.parse(localStorage.getItem(cacheKey) || '{}');
+  const currentTime = Date.now();
+
+  // Check if cached data is available and not expired (e.g., valid for 1 hour)
+  if (
+    cachedData.data &&
+    cachedData.timestamp &&
+    currentTime - cachedData.timestamp < 3600000
+  ) {
+    return cachedData.data;
+  }
+
   const accessToken = await fetchAccessToken();
 
   try {
@@ -64,6 +79,11 @@ async function fetchFlightSchedule(carrierCode, flightNumber, departureDate) {
     }
 
     const data = await response.json();
+    // Cache the new data with a timestamp
+    localStorage.setItem(
+      cacheKey,
+      JSON.stringify({ data, timestamp: currentTime }),
+    );
     return data;
   } catch (error) {
     console.error('Error fetching flight schedule:', error);
@@ -71,4 +91,39 @@ async function fetchFlightSchedule(carrierCode, flightNumber, departureDate) {
   }
 }
 
-export { fetchFlightSchedule };
+async function fetchAirportDetails(iataCode) {
+  const cacheKey = `airport-${iataCode}`;
+  const cachedData = JSON.parse(localStorage.getItem(cacheKey) || '{}');
+
+  if (cachedData.data) {
+    return cachedData.data;
+  }
+
+  const accessToken = await fetchAccessToken();
+
+  try {
+    const response = await fetch(
+      `${AIRPORT_DETAILS_API_URL}?subType=AIRPORT&keyword=${iataCode}&view=LIGHT`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch airport details');
+    }
+
+    const data = await response.json();
+    localStorage.setItem(cacheKey, JSON.stringify({ data }));
+    return data;
+  } catch (error) {
+    console.error('Error fetching airport details:', error);
+    throw error;
+  }
+}
+
+export { fetchFlightSchedule, fetchAirportDetails };
