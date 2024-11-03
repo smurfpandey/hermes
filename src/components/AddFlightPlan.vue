@@ -2,7 +2,7 @@
 import { find } from 'lodash-es';
 import { Calendar as CalendarIcon, Loader2 } from 'lucide-vue-next';
 import dayjs from 'dayjs';
-import { defineEmits, defineProps, ref } from 'vue';
+import { defineEmits, ref } from 'vue';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -30,8 +30,8 @@ import { supabase } from '@/lib/supabaseClient';
 
 const isLoading = ref(false);
 
-const flightDoDCalendarOpen = ref(false);
-const flightDoDValue = ref('');
+const dodCalendarOpen = ref(false);
+const dateOfDeparture = ref('');
 const flightNum = ref('');
 const airlineCode = ref('');
 const isFlightLoading = ref(false);
@@ -48,15 +48,10 @@ const formattedDepartureTime = ref(''); // Only time part for the input box
 const formattedArrivalTime = ref('');
 const isNextDay = ref(false);
 
-const props = defineProps({
-  isParentSheetOpen: {
-    required: true,
-  },
-});
 const emit = defineEmits(['update:isParentSheetOpen']);
 
-const handleFlightDODCal = () => {
-  flightDoDCalendarOpen.value = false;
+const handleDoDCal = () => {
+  dodCalendarOpen.value = false;
 };
 
 const getDisplayDate = (calDate) => {
@@ -64,8 +59,8 @@ const getDisplayDate = (calDate) => {
   return dayjs(date, 'YYYY-MM-DD').format('DD-MMM-YYYY');
 };
 
-const openFlightDoDCalendar = () => {
-  flightDoDCalendarOpen.value = true;
+const openDoDCalendar = () => {
+  dodCalendarOpen.value = true;
 };
 
 const fetchFlightDetail = async () => {
@@ -75,13 +70,13 @@ const fetchFlightDetail = async () => {
   if (!flightNum.value || !/^\d{2,4}$/.test(flightNum.value)) {
     return;
   }
-  if (!flightDoDValue.value) {
+  if (!dateOfDeparture.value) {
     return;
   }
 
   isFlightLoading.value = true;
   try {
-    let departureDate = flightDoDValue.value.toString();
+    let departureDate = dateOfDeparture.value.toString();
     let carrierCode = airlineCode.value.toUpperCase();
 
     const flightInfo = await fetchFlightSchedule(
@@ -167,7 +162,7 @@ const saveFlightPlan = async () => {
     return;
   }
 
-  if (!flightDoDValue.value) {
+  if (!dateOfDeparture.value) {
     errorMessage.value = 'Please select a date of departure';
     return;
   }
@@ -227,30 +222,30 @@ const saveFlightPlan = async () => {
   <div class="space-y-8">
     <div class="grid gap-2">
       <Label for="flightDoD">Date of departure</Label>
-      <Popover :open="flightDoDCalendarOpen">
+      <Popover :open="dodCalendarOpen">
         <PopoverTrigger as-child>
           <Button
             variant="outline"
             :class="
               cn(
                 'w-full ps-3 text-start font-normal',
-                !flightDoDValue && 'text-muted-foreground',
+                !dateOfDeparture && 'text-muted-foreground',
               )
             "
-            @click="openFlightDoDCalendar"
+            @click="openDoDCalendar"
           >
             <span>{{
-              flightDoDValue ? getDisplayDate(flightDoDValue) : 'Pick a date'
+              dateOfDeparture ? getDisplayDate(dateOfDeparture) : 'Pick a date'
             }}</span>
             <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent class="w-auto p-0">
           <Calendar
-            v-model="flightDoDValue"
+            v-model="dateOfDeparture"
             calendar-label="Date of departure"
             initial-focus
-            @update:model-value="handleFlightDODCal"
+            @update:model-value="handleDoDCal"
           />
         </PopoverContent>
       </Popover>

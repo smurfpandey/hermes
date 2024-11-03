@@ -14,6 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import AddFlightPlan from '@/components/AddFlightPlan.vue';
+import AddTrainPlan from '@/components/AddTrainPlan.vue';
 
 const isSheetOpen = ref(false);
 </script>
@@ -39,11 +40,7 @@ const isSheetOpen = ref(false);
           <AddFlightPlan v-model:isParentSheetOpen="isSheetOpen" />
         </TabsContent>
         <TabsContent value="train">
-          <SheetFooter>
-            <SheetClose as-child>
-              <Button type="submit"> Save Train </Button>
-            </SheetClose>
-          </SheetFooter>
+          <AddTrainPlan v-model:isParentSheetOpen="isSheetOpen" />
         </TabsContent>
       </Tabs>
     </SheetContent>
