@@ -70,6 +70,10 @@ const fetchPNRDetail = async () => {
     arrivalStationName.value = station.name;
   }
 };
+
+const saveTrainPlan = async () => {
+  console.log('Save Train Plan');
+};
 </script>
 
 <template>
@@ -130,9 +134,9 @@ const fetchPNRDetail = async () => {
     </div>
     <span v-if="errorMessage" class="text-red-500">{{ errorMessage }}</span>
     <SheetFooter class="mt-4">
-      <Button type="submit" @click="saveFlightPlan" :disabled="isLoading">
+      <Button type="submit" @click="saveTrainPlan" :disabled="isLoading">
         <Loader2 class="w-4 h-4 mr-2 animate-spin" v-if="isLoading" />
-        Save Flight
+        Save Train
       </Button>
     </SheetFooter>
   </div>
